@@ -1,0 +1,17 @@
+.containerGap{
+    margin-top: 40px;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+}
+
+.form input{
+    width: 70%;
+}
+.form button{
+    margin-top: 15px;
+    width: 30%;
+}
