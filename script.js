@@ -32,8 +32,20 @@ document.addEventListener("DOMContentLoaded", () =>{
         //pobieranie wartosci z pierwszego inputa
         let product = formData.target.elements[0].value;
 
-        //wysyłanie nazwy produktu do funkcji tworzącej element listy w htmlu
-        addListItem(list, product);
+        //łapanie elementu odpowiedzialnego za wyświetlanie błedu walidacji
+        let validationError = document.getElementById('validationError');
+
+        //walidacja
+        if(product.length > 2 && !product.startsWith(' ')){
+            validationError.innerText = "";
+            formData.target.elements[0].classList.remove('inputError');
+            //wysyłanie nazwy produktu do funkcji tworzącej element listy w htmlu
+            addListItem(list, product);
+        }else{
+            console.log("blad");
+            validationError.innerText = "Wprowadzono niepoprawne dane";
+            formData.target.elements[0].classList.add('inputError');
+        }
 
         //czyszczenie inputa
         formData.target.elements[0].value = "";
