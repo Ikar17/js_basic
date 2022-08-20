@@ -8,7 +8,10 @@
     margin-top: 15px;
 }
 
-.form input{
+.form-group{
+    margin-bottom: 8px;
+}
+.form input, textarea{
     width: 70%;
 }
 .form button{
@@ -20,7 +23,7 @@
     border: 3px solid red;
 }
 
-#validationError{
+#validationError, #nameError, #descError{
     color: red;
     font-size: 12px;
 }
