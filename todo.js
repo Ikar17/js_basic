@@ -5,13 +5,18 @@ function addListItem(list,product){
 }
 
 
-let todoList = [];
+let todoList;
+let ul;
 
 //czekam aż cały dokument załaduje się
 document.addEventListener("DOMContentLoaded", () =>{
-    //łapię listę z produktami
-    let ul = document.getElementById("todoList");
 
+    //łapię listę z produktami
+    ul = document.getElementById("todoList"); 
+
+    //odczytuje dane z local storage
+    todoList = readToDoList();
+    renderList();
 
     //łapię formularz
     let form = document.getElementById('formTodo');
@@ -44,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () =>{
 
             //sprawdzanie duplikatów
             for(let task of todoList){
-                console.log(task.name);
                 if(task.name == todoName.value){
                     return;
                 }
@@ -54,13 +58,11 @@ document.addEventListener("DOMContentLoaded", () =>{
             todoList.push(todo);
             console.log(todoList);
 
+            //zapisywanie danych do local storage
+            localStorage.setItem('todoList', JSON.stringify(todoList));
+
             //wyswietlanie zadan
-            ul.innerHTML=""; //zeruje listę w HTMLu
-            for(let task of todoList){
-                let li = document.createElement("li");
-                li.innerText = task.name;
-                ul.appendChild(li);
-            }
+            renderList();
     
             //czyszczenie inputa
             formData.target.elements[0].value = "";
@@ -77,8 +79,6 @@ document.addEventListener("DOMContentLoaded", () =>{
                 todoDesc.classList.add("inputError");
             }
             
-            
-
             console.log("cos nie tak");
         }
 
@@ -88,3 +88,78 @@ document.addEventListener("DOMContentLoaded", () =>{
 
 
 
+const renderList = () => {
+
+    //czyszczenie przed wyswietlaniem nowej listy zadan - usuwanie "nasłuchiwania" przycisków
+    let liList = Array.from(ul.getElementsByTagName('li'));
+    liList.forEach((li) => {
+        let button = li.getElementsByTagName('button')[0];
+        button.removeEventListener("click", changeTaskStatus);
+    })
+
+    ul.innerHTML=""; //zeruje listę w HTMLu
+
+    //wyświetlanie
+    todoList.forEach((task, index) => {
+        let li = document.createElement("li");
+        li.classList.add('list-group-item', 'd-flex', 'justify-content-between' ,'align-items-start');
+
+        let main = document.createElement("main");
+        let heading = document.createElement("h5");
+        let paragraph = document.createElement("p");
+        let button = document.createElement("button");
+
+        heading.innerText = task.name;
+        heading.classList.add('fw-bold');
+
+        paragraph.innerText = task.desc;
+
+        button.addEventListener("click", changeTaskStatus);
+        button.dataset.taskId = index; //tworzenie własnej "właściwości" dla przycisku, która przyjmuje jako wartość indeks w tablicy zadań
+
+        if(task.done){
+            button.innerText ="Zadanie wykonane";
+            button.classList.add('btn', 'btn-sm', 'btn-success');
+            main.style.textDecoration = 'line-through';
+        }else{
+            button.innerText ="Zadanie niewykonane";
+            button.classList.add('btn', 'btn-sm', 'btn-danger');
+        }
+        
+
+        main.appendChild(heading);
+        main.appendChild(paragraph);
+        
+        li.appendChild(main);
+        li.appendChild(button);
+        ul.appendChild(li);
+
+    })
+}
+
+
+//funkcja zmieniająca status zadania
+const changeTaskStatus = (event) =>{
+    let task = todoList[Math.round(event.target.dataset.taskId)];
+
+    if(task.done){
+        task.done = false;
+    }else{
+        task.done = true;
+    }
+
+    //zapisywanie danych do local storage (update)
+    localStorage.setItem('todoList', JSON.stringify(todoList));
+
+    renderList();
+}
+
+
+//funkcja do odczytywania danych zapisanych w local storage
+const readToDoList = () =>{
+    if(localStorage.getItem('todoList')){
+        return JSON.parse(localStorage.getItem('todoList'));
+    }else{
+        return [];
+    }
+}
