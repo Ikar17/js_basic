@@ -27,3 +27,7 @@
     color: red;
     font-size: 12px;
 }
+
+.button-group > button{
+    margin-right: 3px;
+}

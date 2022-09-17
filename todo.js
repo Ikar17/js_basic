@@ -93,8 +93,10 @@ const renderList = () => {
     //czyszczenie przed wyswietlaniem nowej listy zadan - usuwanie "nasłuchiwania" przycisków
     let liList = Array.from(ul.getElementsByTagName('li'));
     liList.forEach((li) => {
-        let button = li.getElementsByTagName('button')[0];
-        button.removeEventListener("click", changeTaskStatus);
+        let buttonCheck = li.getElementsByTagName('button')[0];
+        let buttonDelete = li.getElementsByTagName('button')[1];
+        buttonCheck.removeEventListener("click", changeTaskStatus);
+        buttonDelete.removeEventListener("click", deleteTask);
     })
 
     ul.innerHTML=""; //zeruje listę w HTMLu
@@ -107,31 +109,43 @@ const renderList = () => {
         let main = document.createElement("main");
         let heading = document.createElement("h5");
         let paragraph = document.createElement("p");
-        let button = document.createElement("button");
+        let div = document.createElement("div");
+        let buttonCheck = document.createElement("button");
+        let buttonDelete = document.createElement("button");
 
         heading.innerText = task.name;
         heading.classList.add('fw-bold');
 
         paragraph.innerText = task.desc;
 
-        button.addEventListener("click", changeTaskStatus);
-        button.dataset.taskId = index; //tworzenie własnej "właściwości" dla przycisku, która przyjmuje jako wartość indeks w tablicy zadań
+        div.classList.add("button-group");
+
+        buttonCheck.addEventListener("click", changeTaskStatus);
+        buttonCheck.dataset.taskId = index; //tworzenie własnej "właściwości" dla przycisku, która przyjmuje jako wartość indeks w tablicy zadań
 
         if(task.done){
-            button.innerText ="Zadanie wykonane";
-            button.classList.add('btn', 'btn-sm', 'btn-success');
+            buttonCheck.innerText ="Zadanie wykonane";
+            buttonCheck.classList.add('btn', 'btn-sm', 'btn-success');
             main.style.textDecoration = 'line-through';
         }else{
-            button.innerText ="Zadanie niewykonane";
-            button.classList.add('btn', 'btn-sm', 'btn-danger');
+            buttonCheck.innerText ="Zadanie niewykonane";
+            buttonCheck.classList.add('btn', 'btn-sm', 'btn-warning');
         }
+
+        buttonDelete.dataset.taskId = index;
+        buttonDelete.addEventListener("click", deleteTask);
+        buttonDelete.innerText = "Usuń";
+        buttonDelete.classList.add('btn', 'btn-sm', 'btn-danger');
         
 
         main.appendChild(heading);
         main.appendChild(paragraph);
+        div.appendChild(buttonCheck);
+        div.appendChild(buttonDelete);
+
         
         li.appendChild(main);
-        li.appendChild(button);
+        li.appendChild(div);
         ul.appendChild(li);
 
     })
@@ -162,4 +176,17 @@ const readToDoList = () =>{
     }else{
         return [];
     }
+}
+
+//funkcja do usuwania zadania z listy
+const deleteTask = (event) => {
+    todoList = todoList.filter((x,y) =>{
+        if(y==event.target.dataset.taskId) return false;
+        else return true;
+    })
+
+    //zapisywanie danych do local storage (update)
+    localStorage.setItem('todoList', JSON.stringify(todoList));
+
+    renderList();
 }
